@@ -116,7 +116,7 @@ arch -arm64 brew install pkg-config cairo
 
 ## 🔌 Skills.sh Integration
 
-This repository provides two **AI Agent Skills** that can be installed with a single command using [skills.sh](https://skills.sh/):
+This repository provides Manim-focused **AI Agent Skills** that can be installed with a single command using [skills.sh](https://skills.sh/):
 
 ### Install with npx (Recommended)
 
@@ -126,6 +126,9 @@ npx skills add adithya-s-k/manim_skill/skills/manimce-best-practices
 
 # Install ManimGL best practices
 npx skills add adithya-s-k/manim_skill/skills/manimgl-best-practices
+
+# Install Douyin/TikTok short-form Manim workflow
+npx skills add adithya-s-k/manim_skill/skills/douyin-manim-shorts
 
 # Or install both
 npx skills add adithya-s-k/manim_skill/skills/manimce-best-practices adithya-s-k/manim_skill/skills/manimgl-best-practices
@@ -155,6 +158,12 @@ The skills follow the [Agent Skills open standard](https://github.com/anthropics
 - You work with InteractiveScene, 3D rendering, or camera frame control
 - You use interactive mode with `.embed()` or `checkpoint_paste()`
 
+**douyin-manim-shorts** - Automatically loads when:
+- You want a Douyin/TikTok-style short educational video with Manim
+- You need vertical 9:16 Chinese knowledge video scripts, subtitles, and ManimCE code
+- You are making short AI/ML, math, paper/model, course, or science explainers
+- You want a hook-first, mobile-readable, 15-90 second video workflow
+
 ---
 
 ## 📖 Using This Repository
@@ -171,6 +180,12 @@ manim_skill/
 │   │       ├── scenes.md
 │   │       ├── mobjects.md
 │   │       └── ...
+│   │
+│   ├── douyin-manim-shorts/          # Douyin/TikTok short-form Manim workflow
+│   │   ├── SKILL.md
+│   │   └── templates/
+│   │       ├── douyin-script-template.md
+│   │       └── vertical_scene.py
 │   │
 │   └── manimgl-best-practices/     # ManimGL skills
 │       ├── SKILL.md
