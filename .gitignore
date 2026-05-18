@@ -4,6 +4,27 @@ media/
 
 # Video files
 *.mp4
+*.mov
+*.mkv
+*.avi
+
+# Audio render/output files
+*.wav
+*.mp3
+*.aac
+*.m4a
+*.flac
+
+# Episode generated media
+episodes/**/audio/
+episodes/**/renders/
+episodes/**/qa/
+episodes/**/qa_*/
+
+# Shared media libraries; keep registries and docs in git, not bulky assets
+shared_assets/bgm_library/**/*.wav
+shared_assets/bgm_library/**/*.mp3
+shared_assets/sfx/
 
 # Manim generated files
 partial_movie_files/

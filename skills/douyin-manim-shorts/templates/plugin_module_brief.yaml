@@ -1,0 +1,33 @@
+module_name:
+full_name:
+paper_title:
+paper_pdf_path:
+code_path:
+architecture_image_path:
+core_problem:
+main_idea:
+plug_position:
+input_shape:
+output_shape:
+module_steps:
+  -
+  -
+  -
+code_usage:
+suitable_tasks:
+  -
+limitations:
+  -
+douyin_hook:
+target_duration_seconds:
+visual_style:
+voiceover_tone:
+bgm_style: tech_fast
+bgm_auto_select: true
+bgm_path:
+bgm_volume: 0.15
+voiceover_volume: 1.0
+sfx_volume: 0.25
+music_mood:
+music_energy:
+cta:

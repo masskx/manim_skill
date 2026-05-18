@@ -1,0 +1,32 @@
+module_name: AFDA
+full_name: Adaptive Frequency Domain Alignment Adapter
+paper_title: "Adaptive Frequency Domain Alignment Network for Medical Image Segmentation"
+paper_pdf_path: "F:\\即插即用模块\\已使用\\AFDA\\AFDA.pdf"
+code_path: "F:\\即插即用模块\\已使用\\AFDA\\AFDA.py"
+architecture_image_path: "F:\\即插即用模块\\已使用\\AFDA\\Snipaste_2026-05-18_08-01-53.jpg"
+core_problem: "医学分割换到新数据域后，模型容易把边界、病灶细节和成像风格混在一起，导致跨域泛化不稳。"
+main_idea: "AFDA 把特征拆成低频全局信息和高频细节信息：低频生成门控，高频经过轻量卷积适配，再把被筛选过的细节残差加回原特征。短视频里讲成：先分频，再筛细节，最后接回 backbone。"
+plug_position: "根据提供的 AFDA.py，可作为特征图适配器插在视觉 backbone 或卷积/Transformer block 输出之后、任务头或 decoder 之前；论文架构中频域特征经重采样后与 SegFormer 的空间特征一起进入 Spatial-Frequency Integration 和 decoder。"
+input_shape: "代码要求 4D 特征图 Tensor，形如 B,C,H,W；C 需要等于 AFDA(channels=...) 中的 channels。具体 B,H,W 需根据 backbone 确认。"
+output_shape: "与输入同形状 B,C,H,W；代码通过残差形式 return x + ... 输出增强特征。"
+module_steps:
+  - "用 3x3 avg_pool 得到低频 low，并用 high = x - low 得到高频细节。"
+  - "高频 high 经过 1x1 降维、深度卷积混合、1x1 升维，得到 adapted。"
+  - "低频 low 经过全局池化和 sigmoid 生成 gate，控制 adapted 的贡献，再按残差加回 x。"
+code_usage: |
+  afda = AFDA(channels=64)      # 通道数对齐特征图
+  feat = backbone(x)            # 提取原始特征
+  feat = afda(feat)             # 分频适配后再输出
+suitable_tasks:
+  - "跨域医学图像分割"
+  - "病灶、血管、皮肤等边界和细节敏感的视觉分割任务"
+  - "需要在已有 backbone 后加轻量特征适配器的实验"
+limitations:
+  - "提供代码是紧凑版 AFDA 适配器，不等同于论文完整 AFDAN 的 STFF、ADL、SFI 三模块训练框架。"
+  - "论文未在提供材料中给出该紧凑代码作为独立插件的完整消融结论。"
+  - "输入输出通道和插入层位需要结合具体 backbone 确认。"
+douyin_hook: "医学分割跨域崩？先给特征做一次分频适配。"
+target_duration_seconds: 24
+visual_style: "竖屏 9:16，深色背景，青色表示低频全局，黄色表示高频细节，红色提示跨域偏移；原论文白底架构图只做局部放大，主体用 Manim 简化重绘。"
+voiceover_tone: "自然、直接、偏工程实用，不像论文汇报。"
+cta: "想看我把 AFDA 画成 Manim 动画，评论区打 AFDA。"
