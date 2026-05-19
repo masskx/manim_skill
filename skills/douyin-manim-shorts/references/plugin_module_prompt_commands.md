@@ -44,6 +44,23 @@ Use these command templates when asking the skill to produce a deep learning plu
 如果 contact sheet 中发现元素挤压、重叠、越界或主视觉不清楚，不允许输出 final_with_bgm.mp4，先做 layout_fix。
 ```
 
+## Layered Layout And Arrow Routing Command
+
+```text
+生成 Manim 场景时必须使用 Layered Layout。
+
+公式放 formula_layer，图形放 diagram_layer，箭头只在 arrow lanes 中布线，字幕放 subtitle_layer，CTA 放 cta_layer。
+禁止公式和图形共享同一 y 中心。
+禁止把 MathTex 放在 pipeline 箭头路径中。
+禁止箭头穿过公式、文字、代码、CTA 或字幕。
+所有箭头必须从对象边缘连接，不能从中心连到中心。
+如果直线箭头会穿过公式或文字，必须使用 make_elbow_arrow。
+如果公式、图形、箭头无法清楚共存，必须拆成公式主导帧和图形主导帧。
+每帧遵守复杂度预算：1 个标题、1 个核心公式、1 个主图形组、最多 3 个模块框、最多 3 条主箭头、1 条字幕，非 CTA 页不显示 CTA。
+生成 contact sheet 后必须专项检查 formula vs diagram、formula vs arrows、arrows vs labels、diagram vs subtitle、CTA vs subtitle。
+任何碰撞都必须记录到 qa_report.md；未生成 layout_fix 前不得输出 final_with_bgm.mp4。
+```
+
 ## Content-first New Episode Command
 
 ```text

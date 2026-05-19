@@ -155,6 +155,51 @@ Inspect every contact-sheet frame for:
 
 If any item fails, QA fails. Do not output the final version; create a `layout_fix` revision first and regenerate the contact sheet.
 
+## Formula / Diagram / Arrow Layer QA
+
+Every frame with `MathTex`, module diagrams, or arrows must pass this specialized check:
+
+- Formula uses `MathTex` and occupies `formula_layer` by default.
+- Diagram objects occupy `diagram_layer`, not the formula track.
+- Formula and diagram do not share one y center.
+- Formula does not overlap diagram objects.
+- Formula is not crossed by arrows or connector lines.
+- Arrows stay inside the intended arrow lanes.
+- Arrows start and end at object edges, not centers.
+- Arrows do not cover module text, labels, `Text`, `MathTex`, code, CTA, or subtitles.
+- Arrows do not enter `formula_layer`, `subtitle_layer`, or `cta_layer`.
+- Diagram does not enter `formula_layer` or `subtitle_layer`.
+- A frame does not contain a long formula plus many modules plus many arrows.
+- If the frame is crowded, it has been split into a formula-led frame and a diagram-led frame.
+
+Required layer/collision checks in `qa_report.md`:
+
+| Check | Pass/Fail | Notes |
+|---|---|---|
+| formula vs diagram |  |  |
+| formula vs arrows |  |  |
+| arrows vs labels |  |  |
+| arrows vs code panel |  |  |
+| CTA vs subtitle |  |  |
+| diagram vs subtitle |  |  |
+| complexity budget |  |  |
+
+If any formula/diagram/arrow collision is visible in the contact sheet, QA fails. Do not output `final_with_bgm.mp4`; create a `layout_fix` version first.
+
+## Complexity Budget
+
+For each frame, verify the content budget:
+
+- [ ] No more than one title.
+- [ ] No more than one core formula.
+- [ ] No more than one main diagram group.
+- [ ] No more than three main module boxes.
+- [ ] No more than three main arrows.
+- [ ] No more than one subtitle.
+- [ ] CTA appears only on CTA pages.
+
+If the budget is exceeded, split the content into multiple frames instead of shrinking or stacking elements.
+
 ## Repeat-Template Check
 
 Compare the current episode's `storyboard.md`, `voiceover.txt`, and `scene.py` with the previous episode using a simple text similarity check. If similarity is high, add this QA warning:

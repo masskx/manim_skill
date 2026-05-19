@@ -327,6 +327,11 @@ Mandatory layout system:
 - Place objects in named zones before writing animations. Do not use ad hoc `shift`, `move_to`, or `next_to` chains as the primary layout method.
 - After every `Text`, `MathTex`, `Code`, `VGroup`, arrow, or module block is placed, check safe width, zone height, overlap, subtitle-zone collision, and edge contact.
 - A page may not animate until its static layout passes. Template provides workflow, not content structure; layout provides positions, not mechanism content.
+- Every Manim page must use Layered Layout: `title_layer`, `formula_layer`, `diagram_layer`, `arrow_layer`, `annotation_layer`, `cta_layer`, and `subtitle_layer`.
+- `MathTex` belongs in `formula_layer`; diagrams belong in `diagram_layer`; arrows route only through diagram arrow lanes.
+- Arrows must connect object edges, not centers. If a direct arrow would cross formula, text, code, CTA, or subtitle, use an elbow arrow or split the content into another frame.
+- Formula and diagram may not share the same y center. If the formula and diagram are both complex, make one formula-led frame and one diagram-led frame.
+- Each frame follows the complexity budget: one title, one core formula, one main diagram group, at most three main module boxes, at most three main arrows, one subtitle, and no CTA except on CTA pages.
 
 Required 9:16 module-video zones use `frame_width ≈ 7.2` and `frame_height ≈ 12.8`:
 
@@ -337,6 +342,9 @@ Required 9:16 module-video zones use `frame_width ≈ 7.2` and `frame_height ≈
 - `code_zone`: y `-0.8` to `1.7`, max width `frame_width * 0.86`.
 - `subtitle_zone`: y `-3.25` to `-2.75`, max width `frame_width * 0.88`.
 - `cta_zone`: y `-2.55` to `-1.65`, max width `frame_width * 0.86`.
+- `formula_layer`: y `1.55` to `2.45`; MathTex only.
+- `diagram_layer`: y `-1.05` to `1.25`; modules, feature maps, heatmaps, spectra, nodes.
+- `annotation_layer`: y `-1.65` to `-1.15`; short labels only.
 
 Hard layout rules:
 
@@ -346,6 +354,8 @@ Hard layout rules:
 - Title and formula must have at least `0.35` vertical separation.
 - Code panel and CTA must have at least `0.35` vertical separation.
 - Each frame must have one clear main visual center.
+- No arrow may pass through a formula, label, code panel, CTA, or subtitle.
+- Formula/diagram/arrow collisions must be recorded in `qa_report.md`; collision means QA fails.
 - If layout QA fails, create a `layout_fix` version before final render.
 
 Typography hierarchy:

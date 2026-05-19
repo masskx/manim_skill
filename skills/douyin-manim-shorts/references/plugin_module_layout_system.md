@@ -53,6 +53,55 @@ Hard limits:
 - Code panel and CTA must be separated by at least `0.35`.
 - Each frame may have only one main visual center.
 
+## Layered Layout: Highest Priority Visual Separation
+
+Every Manim page must be designed as layered composition, not as one shared pile of objects. Decide the layer for each object before placing it.
+
+| Layer | Allowed content | y range | z_index |
+|---|---|---:|---:|
+| `title_layer` | title only | `2.90` to `3.65` | `5` |
+| `formula_layer` | `MathTex` formulas only | `1.55` to `2.45` | `4` |
+| `diagram_layer` | modules, feature maps, heatmaps, spectra, nodes | `-1.05` to `1.25` | `3` |
+| `arrow_layer` | arrows, connector lines, flow particles only | inside diagram lanes | `2` |
+| `annotation_layer` | short labels, callouts, "copy 3 lines" notes | `-1.65` to `-1.15` | `5` |
+| `cta_layer` | CTA only | `-2.45` to `-1.75` | `7` |
+| `subtitle_layer` | subtitles only | `-3.25` to `-2.85` | `6` |
+
+Hard layered-layout rules:
+
+- `MathTex` formulas default to `formula_layer`; diagrams default to `diagram_layer`.
+- Formulas and diagrams must not share the same y center or the same arrow lane.
+- Arrows must be routed inside `diagram_layer`; they must not cross `formula_layer`, `subtitle_layer`, or `cta_layer`.
+- Formulas must not sit inside the middle of a module pipeline or between two arrows.
+- Arrows must never start at object centers, end at object centers, or cover internal text.
+- If a formula and a diagram are both complex, split them into two frames instead of shrinking them into one crowded frame.
+
+## Formula And Diagram Separation
+
+Formula pages must choose one of two modes:
+
+### Mode A: Formula-led page
+
+- Title stays in `title_layer`.
+- Formula stays in `formula_layer`.
+- Diagram is a simplified support visual in `diagram_layer`.
+- The support visual contains at most three modules.
+- The page uses at most two arrows.
+
+### Mode B: Diagram-led page
+
+- Title stays in `title_layer`.
+- Diagram stays in `diagram_layer`.
+- Formula is omitted, or reduced to one short local expression.
+- The full formula explanation moves to the next frame.
+
+Forbidden:
+
+- One frame containing a long formula, a multi-module diagram, many arrows, subtitles, and CTA.
+- A formula crossing the visual center while arrows pass over it.
+- Formula and modules sharing one horizontal track.
+- `MathTex` placed on a pipeline arrow path.
+
 ## Layout Templates
 
 ### `title_visual_subtitle_layout`
@@ -77,6 +126,8 @@ Use for formula explanation pages.
 - Put explanatory visual at `y=-0.6` to `0.5`.
 - Put subtitle in the bottom safe area.
 - If the formula is wide, call `scale_to_fit_width(config.frame_width * 0.82)`.
+- Use Formula-led mode: at most one small support visual and one or two short arrows.
+- Do not put a complex branch diagram under a long formula; split the page.
 
 ### `pipeline_layout`
 
@@ -85,7 +136,9 @@ Use for input -> module -> output scenes.
 - Input module: `x=-2.2`.
 - Middle module: `x=0`.
 - Output module: `x=2.2`.
-- All modules: `y=0.4`.
+- All modules: `y=0.2` in `diagram_layer`.
+- Arrow lane: `y=0.2`.
+- Formula lane: `y=1.8`; formulas must not sit on the module/arrow lane.
 - Arrows connect object edges, not centers, and never pass through label text.
 - If total module width exceeds `6.2`, switch to a two-row layout.
 
@@ -94,12 +147,22 @@ Use for input -> module -> output scenes.
 Use for dual/multi-branch, Residual, or Gating mechanisms.
 
 - Input: `x=-2.4, y=0.4`.
-- Upper branch: `y=1.0`.
-- Lower branch: `y=-0.4`.
-- Fusion node: `x=1.4, y=0.3`.
+- Upper branch arrow lane: `y=0.85`.
+- Lower branch arrow lane: `y=-0.55`.
+- Fusion/Gate/Add node: `x=1.2, y=0.15`.
 - Output: `x=2.5, y=0.3`.
 - Vertical branch gap must be at least `0.75`.
+- Formula must not sit on `y=0.85` or `y=-0.55`.
 - Arrows must not pass through labels.
+
+### `formula_layout`
+
+Use for derivation pages.
+
+- Complex arrows are forbidden.
+- Formula owns the page.
+- Under the formula, place at most one lightweight visual.
+- Arrow count is limited to one or two.
 
 ### `code_cta_layout`
 
@@ -112,6 +175,7 @@ Use for the final code and CTA page.
 - Subtitle around `y=-3.15`.
 - `code_panel` must not exceed `visual_zone`.
 - CTA must not overlap subtitles.
+- Complex process arrows are forbidden on code pages.
 
 ## Required Manim Layout Helpers
 
@@ -127,6 +191,16 @@ ZONES = {
     "code_zone": {"center": [0, 0.45, 0], "max_width": config.frame_width * 0.86, "max_height": 2.5},
     "subtitle_zone": {"center": [0, -3.00, 0], "max_width": config.frame_width * 0.88, "max_height": 0.55},
     "cta_zone": {"center": [0, -2.10, 0], "max_width": config.frame_width * 0.86, "max_height": 0.9},
+}
+LAYERS = {
+    "background": 0,
+    "grid": 1,
+    "arrows": 2,
+    "diagram": 3,
+    "formula": 4,
+    "labels": 5,
+    "subtitles": 6,
+    "cta": 7,
 }
 
 def safe_scale_to_width(mobject, max_width):
@@ -164,6 +238,47 @@ def make_safe_title(text):
 def arrange_without_overlap(group, direction=DOWN, buff=0.25):
     group.arrange(direction, buff=max(buff, 0.25), aligned_edge=ORIGIN)
     return group
+
+def set_layer(mobject, layer_name):
+    mobject.set_z_index(LAYERS[layer_name])
+    return mobject
+
+def edge_point(mobject, side, buff=0.08):
+    if side == "right":
+        return mobject.get_right() + RIGHT * buff
+    if side == "left":
+        return mobject.get_left() + LEFT * buff
+    if side == "top":
+        return mobject.get_top() + UP * buff
+    if side == "bottom":
+        return mobject.get_bottom() + DOWN * buff
+    return mobject.get_center()
+
+def make_elbow_arrow(start_obj, end_obj, direction="right", color=WHITE):
+    if direction in ("right", "left_to_right"):
+        p1 = edge_point(start_obj, "right")
+        p4 = edge_point(end_obj, "left")
+        mid_x = (p1[0] + p4[0]) / 2
+        p2 = np.array([mid_x, p1[1], 0])
+        p3 = np.array([mid_x, p4[1], 0])
+    elif direction in ("down", "top_to_bottom"):
+        p1 = edge_point(start_obj, "bottom")
+        p4 = edge_point(end_obj, "top")
+        mid_y = (p1[1] + p4[1]) / 2
+        p2 = np.array([p1[0], mid_y, 0])
+        p3 = np.array([p4[0], mid_y, 0])
+    else:
+        p1 = edge_point(start_obj, "right")
+        p4 = edge_point(end_obj, "left")
+        mid_x = (p1[0] + p4[0]) / 2
+        p2 = np.array([mid_x, p1[1], 0])
+        p3 = np.array([mid_x, p4[1], 0])
+    line = VMobject(color=color, stroke_width=2.4)
+    line.set_points_as_corners([p1, p2, p3, p4])
+    tip = ArrowTriangleFilledTip(color=color).scale(0.16)
+    tip.move_to(p4)
+    tip.rotate(line.get_angle())
+    return set_layer(VGroup(line, tip), "arrows")
 ```
 
 `check_overlaps(mobjects)` must inspect bounding boxes before preview render. If overlap is detected, print warnings and record them in `qa_report.md`.
@@ -194,6 +309,99 @@ def check_overlaps(mobjects, label="scene"):
         print("[layout-warning]", warning)
     return warnings
 ```
+
+For collision-specific QA, use `check_collision()` with role names so reports can say exactly what failed:
+
+```python
+def check_collision(named_mobjects, label="scene"):
+    # named_mobjects: [("formula", formula), ("diagram", diagram), ("arrows", arrows)]
+    warnings = []
+    pairs_to_check = {
+        ("formula", "diagram"),
+        ("formula", "arrows"),
+        ("formula", "title"),
+        ("arrows", "labels"),
+        ("arrows", "code_panel"),
+        ("cta", "subtitle"),
+        ("diagram", "subtitle"),
+        ("code_panel", "cta"),
+    }
+    visible = [(name, mob) for name, mob in named_mobjects if mob is not None]
+    for i, (name_a, mob_a) in enumerate(visible):
+        for name_b, mob_b in visible[i + 1:]:
+            if (name_a, name_b) in pairs_to_check or (name_b, name_a) in pairs_to_check:
+                if boxes_overlap(mob_a, mob_b):
+                    warnings.append(f"{label}: {name_a} collides with {name_b}")
+    for warning in warnings:
+        print("[collision-warning]", warning)
+    return warnings
+```
+
+Any collision warning must be copied into `qa_report.md`. A release candidate with formula/diagram/arrow/subtitle/CTA collision is not final; make a `layout_fix` revision first.
+
+## Arrow Routing Rules
+
+Arrows must connect object edges, never centers.
+
+Recommended edge routes:
+
+- Left to right: `start = left_obj.get_right() + RIGHT * 0.08`, `end = right_obj.get_left() + LEFT * 0.08`.
+- Top to bottom: `start = top_obj.get_bottom() + DOWN * 0.08`, `end = bottom_obj.get_top() + UP * 0.08`.
+- Branch arrows use `make_elbow_arrow()` or a short segmented path.
+
+Forbidden arrow routes:
+
+- `Arrow(left_obj.get_center(), right_obj.get_center())`.
+- Arrow paths through `Text`, `MathTex`, CTA, subtitle, or module labels.
+- Long arrows spanning multiple layers.
+- Arrows sharing the y track of a formula.
+
+If a formula, label, or module blocks the direct route, do one of these:
+
+1. Use `make_elbow_arrow()`.
+2. Move the formula back to `formula_layer`.
+3. Split the scene into two frames.
+4. Reduce the diagram to fewer modules.
+
+## z_index Rules
+
+All objects must be assigned a layer-aware `z_index`:
+
+- background: `0`
+- grid / particles: `1`
+- arrows / lines: `2`
+- boxes / diagrams: `3`
+- formula: `4`
+- text labels: `5`
+- subtitles: `6`
+- CTA: `7`
+
+`z_index` controls visual stacking only. It does not make an overlap acceptable. If a label hides an arrow, the arrow path still needs rerouting.
+
+## Formula Auto-Downgrade
+
+If a formula is too long or consumes too much space, use this order:
+
+1. `scale_to_fit_width(config.frame_width * 0.78)`.
+2. Split it into two `MathTex` rows and `VGroup(...).arrange(DOWN, buff=0.15)`.
+3. Split formula and diagram into two separate frames.
+4. Use a short faithful expression such as `Y = Module(X)`.
+
+Never force a long formula into the middle of a graph pipeline.
+
+## Per-Frame Complexity Budget
+
+Each frame may contain at most:
+
+- one title;
+- one core formula;
+- one main diagram group;
+- three main module boxes;
+- three main arrows;
+- one subtitle;
+- no CTA except on CTA pages.
+
+If the page exceeds this budget, split it into multiple frames. Do not solve density by shrinking everything.
 
 ## Forbidden Layout Patterns
 

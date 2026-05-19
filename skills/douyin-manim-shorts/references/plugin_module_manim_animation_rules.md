@@ -279,6 +279,30 @@ Required workflow for every page:
 4. Run width, height, edge, subtitle-zone, and overlap checks.
 5. Only then animate.
 
+Layered Layout is mandatory for every Manim page:
+
+- `title_layer`: title only.
+- `formula_layer`: `MathTex` only. Formula must not share a y center with the diagram.
+- `diagram_layer`: modules, feature maps, heatmaps, spectra, and nodes.
+- `arrow_layer`: arrows, connector lines, and flow particles only. Arrows stay in diagram lanes.
+- `annotation_layer`: short callouts only.
+- `subtitle_layer`: subtitles only.
+- `cta_layer`: CTA only.
+
+Formula/diagram separation:
+
+- A formula-led page may show one formula, at most three support modules, and at most two arrows.
+- A diagram-led page should omit the formula or use only one very short local expression.
+- Do not put a long `MathTex` formula into the middle of a pipeline or branch diagram.
+- If formula, diagram, and arrows cannot coexist cleanly, split the explanation into multiple frames.
+
+Arrow routing:
+
+- All arrows connect object edges, not centers.
+- Prefer `make_elbow_arrow(start_obj, end_obj, direction="right")` when a direct arrow would cross text or formula.
+- Arrow `z_index` should be below labels/formulas but the path itself still must avoid labels/formulas.
+- Forbidden: `Arrow(left_obj.get_center(), right_obj.get_center())`, arrows through `Text`, arrows through `MathTex`, arrows over code, and arrows entering subtitle/CTA regions.
+
 Use these helpers or equivalent helpers in every generated scene:
 
 - `safe_scale_to_width(mobject, max_width)`
@@ -289,6 +313,8 @@ Use these helpers or equivalent helpers in every generated scene:
 - `arrange_without_overlap(group, direction, buff)`
 - `place_in_zone(mobject, zone_name)`
 - `check_overlaps(mobjects)`
+- `check_collision(named_mobjects)`
+- `make_elbow_arrow(start_obj, end_obj, direction="right", color=WHITE)`
 
 Forbidden layout patterns:
 
@@ -297,9 +323,19 @@ Forbidden layout patterns:
 - Multiple text lines with the same manual y coordinate.
 - Fixed `Rectangle` boxes around labels.
 - Arrows from object center to object center when they pass through text.
+- Arrows crossing formula, code, CTA, subtitles, labels, or module text.
 - `Write(MathTex(...))` or long code display before width checks.
 - More than five major objects in one frame.
 - Title, formula, diagram, subtitle, and CTA piled in the same central area.
+
+Formula auto-downgrade:
+
+1. First fit to `frame_width * 0.78`.
+2. Then split into two `MathTex` rows arranged vertically.
+3. Then split formula and diagram into separate frames.
+4. Last, use a short faithful expression such as `Y = Module(X)`.
+
+Per-frame complexity budget: one title, one core formula, one main diagram group, three main module boxes, three main arrows, one subtitle, and CTA only on CTA pages.
 
 Required layout pass:
 
