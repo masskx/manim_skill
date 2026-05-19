@@ -236,10 +236,16 @@ class DouyinShortTemplate(Scene):
         line.set_points_as_corners([p1, p2, p3, p4])
         tip = ArrowTriangleFilledTip(color=color).scale(0.16)
         tip.move_to(p4)
-        tip.rotate(line.get_angle())
+        tip.rotate(angle_of_vector(p4 - p3))
         group = VGroup(line, tip)
         self.set_layer(group, "arrows")
         return group
+
+    def clear_page(self, *mobjects, run_time=0.35):
+        """Clear beat-local objects before a new page layout or ending CTA."""
+        visible = [mob for mob in mobjects if mob is not None]
+        if visible:
+            self.play(*[FadeOut(mob) for mob in visible], run_time=run_time)
 
     def subtitle_swap(self, current, text):
         new_subtitle = self.make_subtitle(text)

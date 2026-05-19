@@ -2,6 +2,37 @@
 
 This file is a hard rule layer for all Manim plug-in module shorts. It prevents crowded symbols, overlapping formulas, arrows crossing text, subtitle collisions, and CTA/code-page clutter.
 
+Hybrid update: for new deep learning plug-in module shorts, prefer the Hybrid Manim + Remotion workflow. In Hybrid mode, this Manim layout system applies only to local formula/mechanism clips. Global title, subtitles, CTA, code cards, BGM, and final vertical composition move to Remotion.
+
+## Hybrid Remotion Layout Areas
+
+Default Remotion canvas:
+
+- width = 1080
+- height = 1920
+- fps = 30
+
+Fixed Remotion areas:
+
+| Area | Top | Bottom | Owner |
+|---|---:|---:|---|
+| `titleArea` | 80px | 260px | Title and hook |
+| `visualArea` | 300px | 1180px | Manim clips |
+| `infoArea` | 1200px | 1500px | Code card or supporting info |
+| `subtitleArea` | 1540px | 1660px | Timed subtitles |
+| `ctaArea` | 1680px | 1820px | Resource-pack CTA |
+
+Hybrid hard rules:
+
+- Title only in `titleArea`.
+- Manim clips only in `visualArea`.
+- Code card only in `infoArea`, or centered in `visualArea` for code-focused beats.
+- Subtitles only in `subtitleArea`.
+- CTA only in `ctaArea`.
+- Subtitle and CTA must not overlap.
+- Text must have max width and overflow handling.
+- Use zone-based flex/grid containers; do not randomly pile global elements with ad hoc coordinates.
+
 ## Highest Priority Rule: Layout Before Animation
 
 Every Manim scene must follow this order:
@@ -277,7 +308,7 @@ def make_elbow_arrow(start_obj, end_obj, direction="right", color=WHITE):
     line.set_points_as_corners([p1, p2, p3, p4])
     tip = ArrowTriangleFilledTip(color=color).scale(0.16)
     tip.move_to(p4)
-    tip.rotate(line.get_angle())
+    tip.rotate(angle_of_vector(p4 - p3))
     return set_layer(VGroup(line, tip), "arrows")
 ```
 
@@ -339,6 +370,20 @@ def check_collision(named_mobjects, label="scene"):
 
 Any collision warning must be copied into `qa_report.md`. A release candidate with formula/diagram/arrow/subtitle/CTA collision is not final; make a `layout_fix` revision first.
 
+## Page Lifecycle Rule
+
+Every scene beat must own the objects it introduces. Temporary symbols, labels, arrows, braces, matrices, and helper chips must be explicitly faded out, transformed, or removed before the next unrelated beat starts.
+
+Hard rules:
+
+- Do not leave a branch label, token symbol, helper arrow, or matrix on screen after its explanatory beat has ended.
+- Do not let a previous-page object survive into the code page, CTA page, or a new formula page unless it is deliberately reused and still meaningful.
+- Keep an `active_mobjects` group or equivalent per beat. At the beat boundary, clear or transform the whole group before adding the next major visual.
+- If an element is conceptually persistent, restage it in the new layout zone instead of relying on its old coordinates.
+- Before the final CTA/code page, clear all mechanism-only objects so no stale symbols remain behind the ending copy.
+
+This prevents the SHSA-style failure where a bypass symbol or branch label remains visible long after its role has been explained.
+
 ## Arrow Routing Rules
 
 Arrows must connect object edges, never centers.
@@ -362,6 +407,8 @@ If a formula, label, or module blocks the direct route, do one of these:
 2. Move the formula back to `formula_layer`.
 3. Split the scene into two frames.
 4. Reduce the diagram to fewer modules.
+
+ManimCE note: when building segmented arrows with `VMobject.set_points_as_corners`, do not call `line.get_angle()` for the tip direction. Rotate the tip with the final segment direction, for example `angle_of_vector(p4 - p3)`. This avoids runtime failures in ManimCE versions where `VMobject` does not expose `get_angle()`.
 
 ## z_index Rules
 
@@ -402,6 +449,17 @@ Each frame may contain at most:
 - no CTA except on CTA pages.
 
 If the page exceeds this budget, split it into multiple frames. Do not solve density by shrinking everything.
+
+## Ambiguous Contact-Sheet Rule
+
+Contact sheets are intentionally small. If a sampled frame looks like it may contain garbled text, text collision, or unreadable MathTex after downscaling, extract the original-resolution frame at that timestamp and inspect it before deciding pass/fail.
+
+Required action:
+
+1. Save the suspicious timestamp, such as `frame_25s_check.jpg`.
+2. Inspect the full-resolution frame.
+3. Record the result in `qa_report.md`.
+4. If the full-resolution frame is still unclear, create a `layout_fix` revision.
 
 ## Forbidden Layout Patterns
 

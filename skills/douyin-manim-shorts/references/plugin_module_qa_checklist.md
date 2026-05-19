@@ -51,6 +51,7 @@ Before render, include this table in `qa_report.md` or episode notes:
 - `subtitles.srt` exists and matches the current `voiceover.txt` beats.
 - Video duration matches the target range, usually 20-30 seconds.
 - Audio duration is close to video duration.
+- Video stream duration must cover the whole voiceover. If voiceover audio is longer than the rendered video stream by more than about `0.3s`, extend the visible scene with a deliberate final hold or CTA animation; do not allow audio to continue over black or missing video.
 - BGM is mixed into `final_with_bgm.mp4`.
 - BGM volume does not cover Chinese voiceover.
 - Audio has no abrupt cut at the ending.
@@ -129,6 +130,8 @@ Inspect the contact sheet manually:
 - Last 5 seconds: CTA line 1 and line 2 do not overlap.
 - Last 5 seconds: subtitle zone and CTA zone do not collide.
 - Last 5 seconds: title, formula, MathTex, code, and Text stay inside 85% screen width.
+- If a contact-sheet thumbnail looks like garbled text, formula collision, or unreadable MathTex, extract the original-resolution frame at that timestamp and inspect it before passing QA.
+- Record any full-resolution frame checks in `qa_report.md`, including timestamp and result.
 
 ## Layout System QA
 
@@ -171,6 +174,7 @@ Every frame with `MathTex`, module diagrams, or arrows must pass this specialize
 - Diagram does not enter `formula_layer` or `subtitle_layer`.
 - A frame does not contain a long formula plus many modules plus many arrows.
 - If the frame is crowded, it has been split into a formula-led frame and a diagram-led frame.
+- Temporary symbols and branch labels are cleared, transformed, or restaged before the next unrelated beat. No old label may remain visible through the code or CTA page.
 
 Required layer/collision checks in `qa_report.md`:
 
@@ -183,6 +187,8 @@ Required layer/collision checks in `qa_report.md`:
 | CTA vs subtitle |  |  |
 | diagram vs subtitle |  |  |
 | complexity budget |  |  |
+| stale objects after beat transition |  |  |
+| full-resolution check for suspicious contact-sheet frames |  |  |
 
 If any formula/diagram/arrow collision is visible in the contact sheet, QA fails. Do not output `final_with_bgm.mp4`; create a `layout_fix` version first.
 
@@ -224,3 +230,28 @@ Check especially:
 - `renders/final_with_bgm.mp4` exists.
 - `renders/contact_sheet.jpg` exists.
 - `qa_report.md` records BGM path, volume settings, stream check, duration check, and listening notes.
+
+
+## Hybrid QA (Manim Clip + Remotion Final)
+
+Use these checks when using Hybrid Manim + Remotion mode.
+
+### Manim Clip QA
+- [ ] Clip contains only mechanism animation -- no subtitles, no CTA, no global title.
+- [ ] No complex stacking in Manim output.
+- [ ] No formula overflow beyond safe zone.
+- [ ] Clip duration 3-8 seconds.
+- [ ] Background is clean (dark/transparent).
+- [ ] Only one mechanism per clip.
+
+### Remotion Final QA
+- [ ] Title is inside titleArea.
+- [ ] Manim clip is inside visualArea.
+- [ ] Subtitles are inside subtitleArea.
+- [ ] CTA is inside ctaArea.
+- [ ] Code card is readable (font size, contrast).
+- [ ] Subtitle and CTA do not overlap.
+- [ ] BGM exists and voiceover is not masked.
+- [ ] final_with_bgm.mp4 has video and audio streams.
+- [ ] data.json drives all content; no hardcoded module text in Remotion components.
+- [ ] Contact sheet shows clean frames for each beat.

@@ -7,12 +7,14 @@ description: |
 
   Default target: Douyin Chinese audience, vertical 1080x1920, one clear insight per video, content-driven duration, high retention pacing, large subtitles, low formula density, and ManimCE unless the user explicitly asks for ManimGL.
 
-  Also supports deep learning plug-in module shorts: 20-30 second vertical Manim videos that explain one reusable module's pain point, mechanism, insertion point, minimal code usage, and resource-pack CTA.
+  Also supports deep learning plug-in module shorts: 20-30 second vertical Hybrid Manim + Remotion videos that explain one reusable module's pain point, mechanism, insertion point, minimal code usage, and resource-pack CTA.
 ---
 
 # Douyin Manim Shorts
 
-Use this skill to produce short-form educational videos that feel native to Douyin: fast entry, one idea, clear visual payoff, and mobile-readable Manim animation. It can produce general educational shorts and, as an internal mode of the same skill, deep learning plug-in module shorts for papers, PyTorch modules, and architecture figures.
+Use this skill to produce short-form educational videos that feel native to Douyin: fast entry, one idea, clear visual payoff, and mobile-readable mathematical/mechanism animation. It can produce general educational shorts and, as an internal mode of the same skill, deep learning plug-in module shorts for papers, PyTorch modules, and architecture figures.
+
+Default recommendation: use **Hybrid Manim + Remotion** for deep learning plug-in module shorts. Manim remains essential for formula and mechanism clips, but Remotion owns the vertical short-video layout, subtitles, CTA, code cards, BGM, transitions, and final composition.
 
 ## Default Output
 
@@ -21,7 +23,7 @@ For each video request, produce these artifacts unless the user asks for less:
 1. `douyin-script.md`: title options, cover text, hook, beat sheet, spoken script, subtitles, visual plan, engagement prompt.
 2. `voiceover.txt`: clean narration lines for recording or text-to-speech.
 3. `subtitles.srt`: subtitle timing draft when the user wants external captions.
-4. `scene.py`: ManimCE vertical scene code using `from manim import *`.
+4. `scene.py`: ManimCE vertical scene code using `from manim import *` for pure-Manim videos, or `manim/scene.py` plus Remotion files for hybrid videos.
 5. Render command: `manim -pql scene.py SceneName` for preview, with higher-quality command if needed.
 6. Post-render QA assets: sampled frames or contact sheet for layout inspection, plus freeze-tail check.
 7. QA checklist: retention, mobile readability, subtitle length, safe areas, overlap, formula rendering, audio stream, and render risks.
@@ -43,7 +45,7 @@ Use this mode when the user provides any combination of:
 - Plug-in module code, especially PyTorch module code.
 - A white-background model architecture figure.
 
-The goal is to turn these materials into a 20-30 second Douyin-ready short video explaining one plug-in deep learning module: what pain point it solves, how the mechanism works, where it plugs into a model, and how to call it with minimal code. Keep the original `douyin-manim-shorts` general-purpose workflow available for other educational shorts; this mode is a specialized path inside the same skill.
+The goal is to turn these materials into a 20-30 second Douyin-ready short video explaining one plug-in deep learning module: what pain point it solves, how the mechanism works, where it plugs into a model, and how to call it with minimal code. Keep the original `douyin-manim-shorts` general-purpose workflow available for other educational shorts; this mode is a specialized path inside the same skill. New plug-in module videos default to Hybrid Manim + Remotion unless the user explicitly asks for a pure-Manim formula/mechanism clip.
 
 This mode should explain:
 
@@ -71,8 +73,11 @@ Load these references for this mode:
 - [references/plugin_module_manim_animation_rules.md](references/plugin_module_manim_animation_rules.md) for MathTex, frequency, gate, residual, attention, and formula-to-code animation patterns.
 - [references/plugin_module_layout_system.md](references/plugin_module_layout_system.md) for mandatory "layout before animation" rules, 9:16 zones, layout templates, helper functions, overlap checks, and layout-pass QA.
 - [references/plugin_module_qa_checklist.md](references/plugin_module_qa_checklist.md) for hard post-render checks learned from AFDA.
+- [references/hybrid_workflow.md](references/hybrid_workflow.md) for the default Hybrid Manim + Remotion production workflow.
 - [references/afda_case_study.md](references/afda_case_study.md) as the first internal case study and failure-mode log.
+- [references/shsa_003_case_study.md](references/shsa_003_case_study.md) as a layout/lifecycle case study, not as an attention template.
 - [references/common_failures.md](references/common_failures.md) as the accumulated failure log for formula, voiceover, style, and QA regressions.
+- [references/skill_evolution.md](references/skill_evolution.md) as the append-only changelog for post-episode skill refinements.
 - [references/plugin_module_prompt_commands.md](references/plugin_module_prompt_commands.md) for reusable user command templates.
 
 Use these templates:
@@ -194,6 +199,8 @@ Differentiated generation flow:
 9. Generate the module-specific code snippet.
 10. Check for previous-episode residue before rendering and again during QA.
 
+After each completed or heavily revised episode, run the post-episode refinement prompt in [prompts/after_episode_skill_refinement.md](prompts/after_episode_skill_refinement.md). Only extract reusable workflow, layout, QA, template, and failure-memory lessons. Do not promote a single module's formula, animation spine, visual metaphor, or code class into the general skill.
+
 Authenticity gate before `scene.py`:
 
 | Mechanism shown in video | Exists in code/paper | Evidence location | Allowed to show |
@@ -215,6 +222,234 @@ Content consistency check:
 - [ ] Subtitles match the voiceover.
 - [ ] Visual metaphor fits the current module type.
 - [ ] No nonexistent mechanism is drawn into the video.
+
+## Hybrid Manim + Remotion Mode (Recommended for Plug-in Module Shorts)
+
+Deep learning plug-in module shorts default to Hybrid Manim + Remotion mode.
+
+Core principle:
+
+- **Manim** generates formula animation, mechanism animation, tensor flow, curves, attention heatmaps, spectra, residual paths, and other local visual clips.
+- **Remotion** owns the whole 9:16 video: layout, titles, subtitles, CTA, code cards, BGM, transitions, edit rhythm, and final export.
+
+Pure Manim mode remains available, but only for:
+- Formula derivations.
+- Single mechanism animations.
+- Videos that do not need complex subtitles, CTA, code layout, BGM, or multi-beat vertical composition.
+
+### Why Hybrid
+
+Recent pure-Manim episodes repeatedly struggled with:
+- Formula and graphic overlap in the same frame.
+- Arrows crossing text, labels, or CTA zones.
+- Subtitle and CTA overlapping at the bottom.
+- Unstable vertical layout.
+- Different module videos squeezing information into inconsistent places.
+- Difficulty keeping a batch of videos visually uniform.
+
+### Responsibility Boundary Rules
+
+Manim no longer handles:
+- Global title layout.
+- Long subtitles.
+- CTA.
+- Multi-line code cards.
+- BGM.
+- Complex vertical information layout.
+- Multi-segment short-video edit rhythm.
+
+Manim only handles:
+- MathTex formula animation and transformation.
+- Mechanism graphics.
+- Curve changes.
+- Spectrum, tensor, attention, residual, gate, branch, and heatmap snippets.
+- Clean clip output.
+
+Remotion handles:
+- 9:16 vertical layout.
+- Title area.
+- Manim clip embed area.
+- Subtitle area.
+- Code cards.
+- CTA.
+- BGM and voiceover composition.
+- Transitions and pacing.
+- Final MP4 output.
+
+### Hybrid Project Structure
+
+Each hybrid episode follows this directory layout:
+
+```text
+episodes/{module_slug}_{index}/
+├── brief.md
+├── storyboard.md
+├── voiceover.txt
+├── subtitles.srt
+├── manim/
+│   ├── scene.py
+│   └── renders/
+│       ├── formula_clip.mp4
+│       ├── mechanism_clip.mp4
+│       └── visual_clip.mp4
+├── remotion/
+│   ├── data.json
+│   ├── composition.tsx
+│   └── components/
+│       ├── Layout.tsx
+│       ├── TitleBlock.tsx
+│       ├── SubtitleBlock.tsx
+│       ├── CodeCard.tsx
+│       ├── CTA.tsx
+│       ├── ManimClip.tsx
+│       └── Background.tsx
+├── audio/
+│   ├── voiceover.wav
+│   ├── bgm.wav
+│   └── mixed_audio.wav
+├── renders/
+│   ├── preview.mp4
+│   ├── final_with_bgm.mp4
+│   └── contact_sheet.jpg
+└── qa_report.md
+```
+
+### Remotion Layout Specification (9:16)
+
+Default Remotion canvas:
+- width = 1080
+- height = 1920
+- fps = 30
+
+Fixed layout zones (y coordinates, top-down):
+
+| Zone | y range | Purpose |
+|---|---|---|
+| titleArea | 80px to 260px | Main title text |
+| visualArea | 300px to 1180px | Manim clip, mechanism animation |
+| infoArea | 1200px to 1500px | Code card, supplementary info |
+| subtitleArea | 1540px to 1660px | Subtitles synced with voiceover |
+| ctaArea | 1680px to 1820px | Resource-pack CTA |
+
+Hard layout rules:
+- Title only in `titleArea`.
+- Manim clip only in `visualArea`.
+- Code card only in `infoArea`, or centered in `visualArea` when the beat is code-focused.
+- Subtitles only in `subtitleArea`.
+- CTA only in `ctaArea`.
+- Subtitle and CTA must not overlap; maintain at least a 20px gap.
+- All areas use CSS flex/grid containers; do not randomly stack text with ad hoc coordinates.
+- Every text element must have `maxWidth` and overflow control.
+
+### Manim Clip Output Rules
+
+When Manim generates clips for the hybrid workflow:
+- Background is transparent or solid dark color, such as `#0a0a1a`.
+- No subtitles in Manim output.
+- No CTA in Manim output.
+- No large global title; at most one local label per clip.
+- No BGM.
+- Clip duration is 3-8 seconds.
+- Each clip expresses exactly one mechanism.
+- If a formula and graphic do not fit together, split them into two clips.
+- All output paths go to `manim/renders/` with predictable names.
+
+### data.json Specification
+
+Remotion must read all module content from `data.json`. No hardcoded module content is allowed inside Remotion components.
+
+```json
+{
+  "moduleName": "CBAM",
+  "moduleType": "Attention",
+  "title": "卷积不知道看哪里？",
+  "hook": ["不是模型不行", "是注意力没分配好"],
+  "clips": [
+    {
+      "type": "manim",
+      "path": "../manim/renders/mechanism_clip.mp4",
+      "start": 6,
+      "duration": 8
+    }
+  ],
+  "code": [
+    "self.cbam = CBAM(channels)",
+    "feat = backbone(x)",
+    "feat = self.cbam(feat)"
+  ],
+  "highlightLine": 3,
+  "cta": {
+    "line1": "PDF笔记 + PyTorch代码 + 架构图",
+    "line2": "评论区打：CBAM"
+  },
+  "bgmStyle": "tech_fast"
+}
+```
+
+### Remotion Component Architecture
+
+All Remotion components are prop-driven and read from `data.json`.
+
+| Component | Props | Purpose |
+|---|---|---|
+| Layout.tsx | children | Global 9:16 safe-area container |
+| TitleBlock.tsx | title, hook[], enterFrame, exitFrame | Title + hook reveal |
+| SubtitleBlock.tsx | lines[], currentIndex, style | Timed subtitle rendering |
+| ManimClip.tsx | src, startFrame, durationFrames | Embed Manim clip at position |
+| CodeCard.tsx | lines[], highlightLine, enterFrame | Code card with highlight |
+| CTA.tsx | line1, line2, enterFrame | Resource pack CTA |
+| Background.tsx | bgmStyle | Uniform tech background |
+
+Requirements:
+- All components accept typed props.
+- No module content is hardcoded inside components.
+- Different modules change only `data.json` and Manim clips.
+- Layout must not break when module content changes.
+
+### Hybrid Generation Flow
+
+1. Read `brief.md` or `plugin_module_brief.yaml`.
+2. Generate `storyboard.md` with hybrid timeline.
+3. Generate `voiceover.txt`.
+4. Generate `subtitles.srt`.
+5. Based on `module_type`, generate 1-3 Manim scenes.
+6. Render Manim clips to `manim/renders/`.
+7. Generate `remotion/data.json` from the brief and clips.
+8. Generate or reuse Remotion composition and components.
+9. Remotion composes the full video.
+10. Auto-select BGM based on `bgmStyle`.
+11. Mix audio and output `renders/final_with_bgm.mp4`.
+12. Generate `renders/contact_sheet.jpg`.
+13. Run full QA and write `qa_report.md`.
+
+### Hybrid QA Rules
+
+Manim clip QA:
+- Clip contains only mechanism animation.
+- Clip has no subtitle, no CTA, no global title, and no BGM.
+- Clip has no complex stacking.
+- Formula and graphics do not overflow the frame.
+- Clip duration is 3-8 seconds.
+
+Remotion final QA:
+- Title is inside `titleArea`.
+- Manim clip is inside `visualArea`.
+- Subtitle is inside `subtitleArea`.
+- CTA is inside `ctaArea`.
+- Code card is readable.
+- Subtitle and CTA do not overlap.
+- BGM exists.
+- `final_with_bgm.mp4` has audio.
+- Remotion components are data-driven, with no hardcoded module text.
+
+### Migration Strategy
+
+- New plug-in module videos default to Hybrid mode.
+- Old episodes can remain pure Manim.
+- AFDA may serve as a pure_manim_case_study for comparison.
+- The second module's layout failures are documented as "Pure Manim Global Layout Failure Case".
+- Do not force rework of existing episodes.
+- [references/hybrid_workflow.md](references/hybrid_workflow.md) provides the detailed hybrid workflow guide.
 
 ## Content Strategy
 
@@ -596,6 +831,25 @@ Before finishing, check:
 - BGM volume is checked against voiceover clarity.
 - `freezedetect` or manual frame inspection finds no long frozen tail.
 - For plug-in module videos, no red debug boxes, no center cross-axis background, no text overflowing label boxes, no arrows passing through text, and no formulas or subtitles outside the vertical safe area.
+Additional Hybrid QA checks when using Hybrid Manim + Remotion mode:
+
+Manim clip QA:
+- [ ] Clip contains only mechanism animation -- no subtitles, no CTA, no global title.
+- [ ] No complex stacking in Manim output.
+- [ ] No formula overflow beyond safe zone.
+- [ ] Clip duration 3-8 seconds.
+
+Remotion final QA:
+- [ ] Title is inside `titleArea`.
+- [ ] Manim clip is inside `visualArea`.
+- [ ] Subtitles are inside `subtitleArea`.
+- [ ] CTA is inside `ctaArea`.
+- [ ] Code card is readable (font size, contrast).
+- [ ] Subtitle and CTA do not overlap.
+- [ ] BGM exists and voiceover is not masked.
+- [ ] `final_with_bgm.mp4` has audio stream.
+- [ ] `data.json` drives all content; no hardcoded module text in Remotion components.
+
 
 ## Common Anti-Patterns
 
@@ -616,3 +870,13 @@ Before finishing, check:
 - Assuming Manim will generate narration from the spoken script automatically.
 - Showing too many arrows, labels, colors, or equations at once.
 - Ending without a conclusion or interaction hook.
+Hybrid-specific anti-patterns:
+
+- Letting Manim render subtitles or CTA when using Hybrid mode.
+- Hardcoding module content (title, code, CTA) inside Remotion TypeScript components instead of reading from data.json.
+- Using Remotion for formula animation or mechanism graphics instead of Manim.
+- Placing Manim clip output outside manim/renders/.
+- Forcing old pure-Manim episodes into the Hybrid workflow without the matching project structure.
+- Using random absolute stacking in Remotion components instead of zone-based flex/grid layout.
+- Having subtitles and CTA in the same vertical zone or overlapping.
+- Using default Remotion 16:9 landscape ratio for vertical shorts.

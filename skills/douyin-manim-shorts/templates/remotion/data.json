@@ -1,0 +1,35 @@
+{
+  "moduleName": "CBAM",
+  "moduleType": "Attention",
+  "title": "卷积不知道看哪里？",
+  "hook": ["不是模型不行", "是注意力没分配好"],
+  "clips": [
+    {
+      "type": "manim",
+      "path": "../manim/renders/mechanism_clip.mp4",
+      "start": 6,
+      "duration": 8
+    }
+  ],
+  "code": [
+    "self.cbam = CBAM(channels)",
+    "feat = backbone(x)",
+    "feat = self.cbam(feat)"
+  ],
+  "highlightLine": 3,
+  "cta": {
+    "line1": "PDF笔记 + PyTorch代码 + 架构图",
+    "line2": "评论区打：CBAM"
+  },
+  "bgmStyle": "tech_fast",
+  "subtitleLines": [
+    {"start": 0.0, "end": 3.0, "text": "Convolution sees everything equally..."},
+    {"start": 3.0, "end": 6.0, "text": "Some channels matter more than others"},
+    {"start": 6.0, "end": 10.0, "text": "Channel attention picks important features"},
+    {"start": 10.0, "end": 14.0, "text": "Spatial attention picks important positions"},
+    {"start": 14.0, "end": 18.0, "text": "CBAM combines both in sequence"},
+    {"start": 18.0, "end": 21.0, "text": "Three lines to plug into any backbone"},
+    {"start": 21.0, "end": 24.0, "text": "PDF notes and code ready for you"}
+  ],
+  "totalDuration": 26
+}
