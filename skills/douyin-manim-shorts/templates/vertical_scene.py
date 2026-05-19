@@ -3,8 +3,8 @@ from pathlib import Path
 
 config.pixel_width = 1080
 config.pixel_height = 1920
-config.frame_width = 9
-config.frame_height = 16
+config.frame_width = 7.2
+config.frame_height = 12.8
 config.background_color = "#10131A"
 
 VOICEOVER_PATH = "audio/voiceover.wav"
@@ -26,39 +26,89 @@ LABEL_SIZE = 28
 TAG_SIZE = 24
 FORMULA_SIZE = 34
 
-TITLE_Y = 6.35
-MAIN_CENTER_Y = 1.2
-FORMULA_Y = -4.25
-SUBTITLE_Y = -6.1
+TITLE_Y = 3.25
+MAIN_CENTER_Y = 0.5
+FORMULA_Y = 1.6
+SUBTITLE_Y = -3.0
 
-# Deep learning plug-in module safe zones. Use these when building compact
-# 20-30 second module videos with formulas, gates, spectra, and code panels.
-PLUGIN_TITLE_Y_RANGE = (3.0, 3.7)
-PLUGIN_MAIN_Y_RANGE = (-1.8, 2.2)
-PLUGIN_SUBTITLE_Y = -3.15
-PLUGIN_CTA_MIN_Y = -3.25
-PLUGIN_CORE_X_RANGE = (-3.0, 3.0)
+# Layout-first 9:16 zones for plug-in module shorts.
+# Every page should choose a scene type and layout template before animation.
+SAFE_X_MIN, SAFE_X_MAX = -3.1, 3.1
+SAFE_Y_MIN, SAFE_Y_MAX = -3.35, 3.65
+ZONES = {
+    "title_zone": {"center": [0, 3.25, 0], "max_width": config.frame_width * 0.86, "max_height": 0.8},
+    "visual_zone": {"center": [0, 0.50, 0], "max_width": config.frame_width * 0.86, "max_height": 3.9},
+    "formula_zone": {"center": [0, 1.60, 0], "max_width": config.frame_width * 0.82, "max_height": 1.2},
+    "code_zone": {"center": [0, 0.45, 0], "max_width": config.frame_width * 0.86, "max_height": 2.5},
+    "subtitle_zone": {"center": [0, -3.00, 0], "max_width": config.frame_width * 0.88, "max_height": 0.55},
+    "cta_zone": {"center": [0, -2.10, 0], "max_width": config.frame_width * 0.86, "max_height": 0.9},
+}
 
 
 class DouyinShortTemplate(Scene):
-    def make_title(self, text):
+    def safe_scale_to_width(self, mobject, max_width):
+        if mobject.width > max_width:
+            mobject.scale_to_fit_width(max_width)
+        return mobject
+
+    def safe_scale_to_height(self, mobject, max_height):
+        if mobject.height > max_height:
+            mobject.scale_to_fit_height(max_height)
+        return mobject
+
+    def fit_to_box(self, mobject, max_width, max_height):
+        self.safe_scale_to_width(mobject, max_width)
+        self.safe_scale_to_height(mobject, max_height)
+        return mobject
+
+    def place_in_zone(self, mobject, zone_name):
+        zone = ZONES[zone_name]
+        self.fit_to_box(mobject, zone["max_width"], zone["max_height"])
+        mobject.move_to(zone["center"])
+        return mobject
+
+    def arrange_without_overlap(self, group, direction=DOWN, buff=0.25):
+        group.arrange(direction, buff=max(buff, 0.25))
+        return group
+
+    def _bbox(self, mobject):
+        return (mobject.get_left()[0], mobject.get_right()[0], mobject.get_bottom()[1], mobject.get_top()[1])
+
+    def _boxes_overlap(self, a, b, pad=0.04):
+        ax1, ax2, ay1, ay2 = self._bbox(a)
+        bx1, bx2, by1, by2 = self._bbox(b)
+        return ax1 < bx2 - pad and ax2 > bx1 + pad and ay1 < by2 - pad and ay2 > by1 + pad
+
+    def check_overlaps(self, mobjects, label="scene"):
+        warnings = []
+        visible = [m for m in mobjects if m is not None]
+        for i, a in enumerate(visible):
+            if a.width > config.frame_width * 0.90:
+                warnings.append(f"{label}: object {i} exceeds 90% frame width")
+            if a.get_left()[0] < SAFE_X_MIN or a.get_right()[0] > SAFE_X_MAX:
+                warnings.append(f"{label}: object {i} outside safe x range")
+            if a.get_bottom()[1] < SAFE_Y_MIN or a.get_top()[1] > SAFE_Y_MAX:
+                warnings.append(f"{label}: object {i} outside safe y range")
+            for j, b in enumerate(visible[i + 1 :], start=i + 1):
+                if self._boxes_overlap(a, b):
+                    warnings.append(f"{label}: object {i} overlaps object {j}")
+        for warning in warnings:
+            print("[layout-warning]", warning)
+        return warnings
+
+    def make_safe_title(self, text):
         title = Text(text, font=FONT, font_size=TITLE_SIZE, weight=BOLD, color=TEXT)
-        title.scale_to_fit_width(8.0)
-        return title.move_to(UP * TITLE_Y)
+        return self.place_in_zone(title, "title_zone")
+
+    def make_title(self, text):
+        return self.make_safe_title(text)
 
     def make_subtitle(self, text):
-        box = RoundedRectangle(
-            width=7.8,
-            height=0.72,
-            corner_radius=0.12,
-            stroke_width=0,
-            fill_color=BLACK,
-            fill_opacity=0.62,
-        )
         label = Text(text, font=FONT, font_size=BODY_SIZE, color=TEXT)
-        label.scale_to_fit_width(7.25)
-        group = VGroup(box, label).move_to(UP * SUBTITLE_Y)
-        return group
+        self.safe_scale_to_width(label, ZONES["subtitle_zone"]["max_width"])
+        box = SurroundingRectangle(label, buff=0.18, corner_radius=0.12, color=BLACK, stroke_width=0)
+        box.set_fill(BLACK, opacity=0.62)
+        return self.place_in_zone(VGroup(box, label), "subtitle_zone")
 
     def make_chip(self, text, color=TEXT, width=1.55):
         box = RoundedRectangle(
@@ -74,17 +124,17 @@ class DouyinShortTemplate(Scene):
         label.scale_to_fit_width(width - 0.22)
         return VGroup(box, label)
 
-    def make_label_box(self, text, color=ACCENT_2, scale=0.52):
-        """Auto-fit label for module names such as Low, High, Gate, AFDA."""
+    def make_label_box(self, text, color=ACCENT_2, font_size=30):
+        """Auto-fit label. Never use a fixed Rectangle wrapper for text."""
         label = Text(
             text,
             font=FONT,
-            font_size=34,
+            font_size=font_size,
             color=color,
             weight=BOLD,
             line_spacing=0.8,
         )
-        label.scale(scale)
+        self.safe_scale_to_width(label, config.frame_width * 0.32)
         box = SurroundingRectangle(
             label,
             buff=0.18,
@@ -108,11 +158,14 @@ class DouyinShortTemplate(Scene):
     def make_formula(self, tex, font_size=36):
         formula = MathTex(tex, font_size=font_size, color=TEXT)
         formula.set_stroke(BLACK, width=4, background=True)
-        return formula
+        return self.fit_to_box(formula, ZONES["formula_zone"]["max_width"], ZONES["formula_zone"]["max_height"])
 
     def construct(self):
         if Path(VOICEOVER_PATH).exists():
             self.add_sound(VOICEOVER_PATH)
+
+        # Layout plan: hook_scene -> title_visual_subtitle_layout.
+        # Place static objects first, run overlap checks, then animate.
 
         title = self.make_title("30秒看懂一个概念")
         subtitle = self.make_subtitle("先抛出一个反直觉问题")
@@ -130,7 +183,10 @@ class DouyinShortTemplate(Scene):
         question = Text("为什么这里会变?", font=FONT, font_size=BODY_SIZE, color=ACCENT, weight=BOLD).next_to(
             triangle, DOWN, buff=0.7
         )
-        question.scale_to_fit_width(7.6)
+        self.safe_scale_to_width(question, ZONES["visual_zone"]["max_width"])
+        visual_group = VGroup(dot_a, dot_b, dot_c, triangle, question)
+        self.fit_to_box(visual_group, ZONES["visual_zone"]["max_width"], ZONES["visual_zone"]["max_height"])
+        self.check_overlaps([title, visual_group, subtitle], label="hook_scene")
 
         self.play(FadeIn(title, shift=DOWN * 0.2), FadeIn(subtitle), run_time=0.7)
         self.play(LaggedStart(FadeIn(dot_a), FadeIn(dot_b), FadeIn(dot_c), lag_ratio=0.2))
@@ -150,12 +206,11 @@ class DouyinShortTemplate(Scene):
             r"\mathrm{Concept}=\mathrm{Objects}+\mathrm{Relations}",
             font_size=FORMULA_SIZE,
         )
-        formula.scale_to_fit_width(7.8)
-        formula.move_to(UP * FORMULA_Y)
+        self.place_in_zone(formula, "formula_zone")
+        self.check_overlaps([title, triangle, formula, subtitle], label="formula_scene")
         self.play(Write(formula), run_time=0.65)
 
         takeaway = Text("复杂概念 = 关系的变化", font=FONT, font_size=BODY_SIZE, color=ACCENT, weight=BOLD)
-        takeaway.scale_to_fit_width(7.8)
-        takeaway.move_to(UP * 3.9)
+        self.place_in_zone(takeaway, "title_zone")
         self.play(ReplacementTransform(question, takeaway), run_time=0.7)
         self.wait(FINAL_HOLD_SECONDS)

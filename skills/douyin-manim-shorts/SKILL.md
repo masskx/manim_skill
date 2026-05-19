@@ -69,8 +69,10 @@ Load these references for this mode:
 - [references/code_to_video_rules.md](references/code_to_video_rules.md) for turning module code into a tiny, readable usage snippet.
 - [references/architecture_figure_rules.md](references/architecture_figure_rules.md) for using white-background architecture figures without crowding the vertical frame.
 - [references/plugin_module_manim_animation_rules.md](references/plugin_module_manim_animation_rules.md) for MathTex, frequency, gate, residual, attention, and formula-to-code animation patterns.
+- [references/plugin_module_layout_system.md](references/plugin_module_layout_system.md) for mandatory "layout before animation" rules, 9:16 zones, layout templates, helper functions, overlap checks, and layout-pass QA.
 - [references/plugin_module_qa_checklist.md](references/plugin_module_qa_checklist.md) for hard post-render checks learned from AFDA.
 - [references/afda_case_study.md](references/afda_case_study.md) as the first internal case study and failure-mode log.
+- [references/common_failures.md](references/common_failures.md) as the accumulated failure log for formula, voiceover, style, and QA regressions.
 - [references/plugin_module_prompt_commands.md](references/plugin_module_prompt_commands.md) for reusable user command templates.
 
 Use these templates:
@@ -84,12 +86,135 @@ Workflow for this mode:
 
 1. Extract only evidence-backed facts from the paper, code, and figure.
 2. Fill `plugin_module_brief.yaml` first. Mark missing fields as `unknown` or `needs_user_input`; do not invent paper conclusions.
-3. Reduce the module to one core insight: "pain point -> module mechanism -> plug position -> minimal code usage".
-4. Use the fixed five-beat structure unless the user asks otherwise: 0-3s pain-point hook, 3-7s problem visualization, 7-15s mechanism animation, 15-21s code insertion, 21-26s resource-pack CTA.
-5. Prefer a simplified Manim block diagram over a full paper figure. Use the original white-background figure only as a cropped reference or local zoom when it helps.
-6. Keep code on screen to 3-5 lines with Chinese comments. Prefer a minimal call like `x = Module(...)(x)` when accurate.
-7. Keep the video focused on module adoption, not a full paper review, benchmark discussion, or source-code lecture.
-8. Manim must do more than PPT-style static boxes: use formulas, transforms, curves, spectra, tensor flow, heatmaps, gate bars, residual links, insertion animations, or formula-to-code transforms where they clarify the module.
+3. Create `mechanism_brief.md` from the current materials. Without it, do not write `scene.py`.
+4. Create `episode_strategy.md`, including module type judgment, unique narrative, forbidden reuse from previous episodes, and differences from the most recent three videos.
+5. Run the authenticity gate: prove every mechanism planned for the video exists in the current paper or code.
+6. Reduce the module to one core insight: "pain point -> current module mechanism -> plug position -> minimal code usage".
+7. Use the five-beat timing as workflow only, not as a content template: 0-3s hook, 3-7s problem, 7-15s mechanism, 15-21s code insertion, 21-26s CTA.
+8. Prefer Manim mathematical derivation and object transformation over static paper-figure replication. Use the original white-background figure only as a cropped reference or local zoom when it helps.
+9. Keep code on screen to 3-5 lines with Chinese comments. Prefer a minimal call like `x = Module(...)(x)` when accurate.
+10. Keep the video focused on module adoption, not a full paper review, benchmark discussion, or source-code lecture.
+11. Manim must do more than PPT-style static boxes: use formulas, transforms, curves, spectra, tensor flow, heatmaps, gate bars, residual links, insertion animations, or formula-to-code transforms only where they clarify the current module.
+
+### Anti-Shell-Template Rule
+
+Highest priority: module content comes before templates. Templates provide the workflow, not the content structure. Every new module must re-extract its own mechanism and redesign its own animation from the current input materials.
+
+Current input materials include:
+
+- Current module paper PDF.
+- Current module code.
+- Current module architecture diagram.
+- User-provided module notes.
+- Current episode topic requirements.
+
+The skill may reuse production workflow, QA checks, 3Blue1Brown style principles, MathTex/Text rendering rules, TTS/subtitle workflow, and render verification workflow.
+
+The skill must not reuse the previous episode's module mechanism, formula, storyboard structure, voiceover phrasing, animation order, or visual metaphor.
+
+Hard rule: "模板提供的是工作流，不是内容结构。每个新模块必须重新抽取机制，重新设计动画。"
+
+WMVF_002 is a success case, not a universal template. Its "decompose -> gate -> fuse -> residual back to main path" structure may only be used when the current module genuinely contains those mechanisms with code or paper evidence.
+
+When generating a new module video, never directly reuse the previous video's formula, mechanism animation, voiceover, variable naming, CTA keyword, or code class. Each episode must start from the current `module_brief` and regenerate:
+
+- `pain_point`
+- `module_type`
+- `core_mechanism`
+- `key_formula`
+- `visual_metaphor`
+- `min_code`
+- `CTA keyword`
+
+QA fails if a new episode contains the previous episode's module name, code class, formula set, CTA keyword, or mechanism animation. In particular:
+
+- Non-frequency modules must not use FFT, Low/High, or Frequency Spectrum visuals by default.
+- Non-gate modules must not use a Gate weight bar by default.
+- Non-AFDA modules must not contain `AFDA` or `self.afda`.
+- Non-current modules must not contain the previous module's code class.
+- Formulas must match the current `module_type`.
+
+Required `brief.md` / `plugin_module_brief.yaml` fields before any scene generation:
+
+```text
+module_name:
+module_abbr:
+module_type:
+source_paper_or_code:
+pain_point:
+target_tasks:
+core_mechanism:
+key_formula:
+visual_metaphor:
+min_integration_code:
+cta_keyword:
+bgm_style:
+```
+
+If any field is missing, complete a draft brief first and mark inferred fields clearly. Do not fall back to an AFDA-style default template.
+
+Required `mechanism_brief.md` questions before `scene.py`:
+
+1. What are the current module full name and abbreviation?
+2. What core problem does the module solve?
+3. What is the input tensor?
+4. What is the output tensor?
+5. What key internal branches exist?
+6. What information does each branch extract?
+7. Does the module contain frequency transform, wavelet decomposition, attention, gating, multi-scale processing, residual learning, prototype learning, expert routing, calibration, contrastive learning, or feature reconstruction?
+8. What is the true core formula?
+9. Which single formula is best for the video focus?
+10. What animation metaphor best expresses this module?
+11. How is this module different from the previous episode?
+12. Which previous-episode structures must not be reused?
+
+Required `episode_strategy.md` fields before `scene.py`:
+
+1. Current module type judgment.
+2. Why this type judgment is justified.
+3. Which structures from the previous episode must not be reused.
+4. This episode's unique narrative approach.
+5. This episode's core animation spine.
+6. This episode's core formula.
+7. This episode's visual metaphor.
+8. Differences from the most recent three videos.
+
+If `episode_strategy.md` conflicts with the paper, code, or `mechanism_brief.md`, regenerate the strategy before writing or rendering `scene.py`.
+
+Differentiated generation flow:
+
+1. Read `module_brief`.
+2. Create and verify `mechanism_brief.md`.
+3. Determine `module_type` from evidence.
+4. Create `episode_strategy.md`.
+5. Select a narrative strategy that matches the module type without copying previous content.
+6. Generate the module-specific pain point.
+7. Generate the module-specific formula.
+8. Generate the module-specific voiceover.
+9. Generate the module-specific code snippet.
+10. Check for previous-episode residue before rendering and again during QA.
+
+Authenticity gate before `scene.py`:
+
+| Mechanism shown in video | Exists in code/paper | Evidence location | Allowed to show |
+|---|---|---|---|
+| Gate | Yes/No | Class/function/variable/line or paper section | Yes/No |
+| Residual | Yes/No | Evidence | Yes/No |
+| Attention | Yes/No | Evidence | Yes/No |
+| Frequency | Yes/No | Evidence | Yes/No |
+| Wavelet | Yes/No | Evidence | Yes/No |
+| Multi-scale | Yes/No | Evidence | Yes/No |
+
+Mechanisms without code or paper evidence are not allowed in the final video.
+
+Content consistency check:
+
+- [ ] Formula comes from the current module, not the previous episode.
+- [ ] Animation shows the current module's real computation flow.
+- [ ] Voiceover explains the current module, not a generic module template.
+- [ ] Subtitles match the voiceover.
+- [ ] Visual metaphor fits the current module type.
+- [ ] No nonexistent mechanism is drawn into the video.
 
 ## Content Strategy
 
@@ -195,6 +320,34 @@ Default visual rules:
 - Keep subtitles in a dedicated bottom caption zone and do not place formulas or diagrams there.
 - If two objects may overlap during animation, animate them through separate zones or fade/transform one before introducing the next.
 
+Mandatory layout system:
+
+- Every Manim scene must first choose a scene type: `hook_scene`, `problem_scene`, `mechanism_scene`, `formula_scene`, `code_scene`, or `cta_scene`.
+- Then choose a layout template: `title_only_layout`, `title_visual_subtitle_layout`, `two_column_layout`, `center_formula_layout`, `pipeline_layout`, `two_branch_layout`, or `code_cta_layout`.
+- Place objects in named zones before writing animations. Do not use ad hoc `shift`, `move_to`, or `next_to` chains as the primary layout method.
+- After every `Text`, `MathTex`, `Code`, `VGroup`, arrow, or module block is placed, check safe width, zone height, overlap, subtitle-zone collision, and edge contact.
+- A page may not animate until its static layout passes. Template provides workflow, not content structure; layout provides positions, not mechanism content.
+
+Required 9:16 module-video zones use `frame_width ≈ 7.2` and `frame_height ≈ 12.8`:
+
+- Safe x range: `-3.1` to `3.1`; safe y range: `-3.35` to `3.65`.
+- `title_zone`: y `2.85` to `3.65`, max width `frame_width * 0.86`.
+- `visual_zone`: y `-1.45` to `2.45`, max width `frame_width * 0.86`.
+- `formula_zone`: y `1.0` to `2.2`, max width `frame_width * 0.82`.
+- `code_zone`: y `-0.8` to `1.7`, max width `frame_width * 0.86`.
+- `subtitle_zone`: y `-3.25` to `-2.75`, max width `frame_width * 0.88`.
+- `cta_zone`: y `-2.55` to `-1.65`, max width `frame_width * 0.86`.
+
+Hard layout rules:
+
+- Main visuals must not enter the subtitle zone.
+- CTA must not go below `y=-3.0`.
+- Titles must not go above `y=3.65`.
+- Title and formula must have at least `0.35` vertical separation.
+- Code panel and CTA must have at least `0.35` vertical separation.
+- Each frame must have one clear main visual center.
+- If layout QA fails, create a `layout_fix` version before final render.
+
 Typography hierarchy:
 
 - Use at most 3 text sizes in one scene family: title, subtitle/body, micro-label.
@@ -217,10 +370,8 @@ Douyin-style layout:
 Recommended vertical zones:
 
 ```text
-Top title zone:       y = 5.7 to 7.1
-Main visual zone:     y = -2.6 to 4.8
-Formula/detail zone:  y = -4.7 to -3.1
-Subtitle zone:        y = -6.7 to -5.7
+Use the plug-in module zone system in references/plugin_module_layout_system.md.
+For legacy 9x16 scenes, map the same zones proportionally instead of freehand placement.
 ```
 
 When a scene needs many objects, use a staged reveal: show title + diagram, then diagram + formula, then takeaway. Do not keep all prior text visible.
@@ -248,10 +399,24 @@ formula = MathTex(
 Formula rules:
 
 - Never put Chinese text inside `MathTex`; place Chinese explanation in a separate `Text`.
+- Never render formulas with `Text`, including fallback paths.
+- Do not mix Chinese and formulas in the same `Text`, `Tex`, or `MathTex` object.
+- If `MathTex` fails, stop and diagnose LaTeX/MiKTeX before rendering; do not silently replace it with plain text.
 - Use raw strings: `r"..."`.
 - Use `\mathrm{softmax}` for words inside formulas.
 - Prefer compact formulas for mobile screens.
 - If LaTeX fails, inspect `media/Tex/*.log` or the generated `.tex` file before rewriting randomly.
+
+### 7.1 3Blue1Brown-style mechanism mode
+
+When the user asks for 3Blue1Brown / 3b1b style, or when the subject is a mathematical mechanism, the scene must be a derivation, not a PPT flowchart:
+
+- Use few words and let formulas, curves, braces, arrows, and object transforms carry the explanation.
+- Avoid large stacks of rounded boxes, label cards, and static process diagrams.
+- Show the real mechanism as a progression, such as decomposition -> gate/modulation -> fusion -> residual return.
+- Keep Chinese text as short helper captions only; never let captions dominate the formula.
+- Prefer `TransformMatchingTex`, `ReplacementTransform`, `Brace`, `Arrow`, `ValueTracker`, and geometric motion over slide-like reveals.
+- Every module must redesign the animation from its own `core_mechanism`; do not reuse a previous module's visual grammar unless the mechanism is genuinely the same.
 
 ### 8. Add audio deliberately
 
@@ -261,8 +426,8 @@ Default audio workflow:
 
 1. Generate `voiceover.txt` with one short line per spoken sentence.
 2. Generate `voiceover_lines.csv` when external TTS timing or per-line synthesis is useful.
-3. Ask the user to record or generate `audio/voiceover.wav` or `audio/voiceover.mp3`.
-4. In `scene.py`, call `self.add_sound("audio/voiceover.wav")` at the start of `construct` if the file exists.
+3. Generate `audio/voiceover.wav` with the project TTS script when an API key is available.
+4. In `scene.py`, call `self.add_sound("audio/voiceover.wav")` at the start of `construct`; for requested voiceover videos, fail fast if the file is missing.
 5. Match total animation duration to the voiceover length.
 6. Verify the final MP4 has an audio stream with `ffprobe`.
 
@@ -274,10 +439,11 @@ Alibaba TTS workflow:
 4. Provide recommended fields: model, voice, format, sample rate, speed/rate if supported.
 5. Standardize the final audio path to `audio/voiceover.wav` even if the TTS platform first returns MP3.
 6. If per-line TTS is used, concatenate line audio in order and verify final duration before rendering.
+7. If `DASHSCOPE_API_KEY` is missing, stop before rendering and tell the user to set it. Do not pretend a voiceover was generated.
+8. Prefer the repository script `scripts/bailian_tts.py` for project episodes when available.
+9. After TTS, verify `audio/voiceover.wav` exists and inspect its duration with `ffprobe`.
 
-If no TTS platform is specified, still prepare the project so the user can place Alibaba-exported audio at `audio/voiceover.wav`.
-
-If no audio file exists, clearly state that the rendered Manim video will be silent and provide the exact path where the user should place the voiceover.
+If no TTS platform is specified, still prepare the project so the user can place Alibaba-exported audio at `audio/voiceover.wav`. If the user requested a voiced video, do not render a final release candidate without the voiceover file.
 
 ### 8.1 Add BGM for release candidates
 
@@ -350,6 +516,18 @@ ffprobe -v error -show_streams output.mp4
 
 If `freezedetect` reports a freeze near the end longer than 2 seconds, remove or shorten the final `self.wait(...)` unless the user explicitly asked for an outro hold.
 
+### 10.1 Required layout pass before final render
+
+Every episode must run these stages:
+
+1. `layout_draft`: generate static key frames or a low-motion draft that focuses on placement.
+2. `contact_sheet_check`: render a contact sheet and inspect every beat.
+3. `layout_fix`: fix overlap, edge contact, clutter, arrow-through-text, or subtitle/CTA collisions before adding content.
+4. `animation_pass`: add motion and 3Blue1Brown-style transforms only after layout passes.
+5. `final_render`: mix audio and export `final_with_bgm.mp4` only after layout QA passes.
+
+The rule is: first clear, then clever. First layout, then animation. First QA, then final.
+
 ## Output Format
 
 When asked to create a video, respond with:
@@ -398,7 +576,10 @@ Before finishing, check:
 - The final hold is short and intentional.
 - The Manim code is renderable with ManimCE.
 - Mathematical formulas use `MathTex`, not `Text`.
-- Audio is either attached with `self.add_sound(...)` or explicitly marked as not yet produced.
+- Mathematical formulas have no `Text` fallback.
+- Chinese explanation uses `Text` and is separated from `MathTex`.
+- Audio is attached with `self.add_sound(...)` when voiceover is requested.
+- `audio/voiceover.wav` exists when voiceover is requested.
 - Alibaba TTS users receive `voiceover.txt` and, when useful, `voiceover_lines.csv` with clean per-line narration.
 - `ffprobe` shows both video and audio streams when audio was requested.
 - Release candidates include both `preview_no_bgm.mp4` and `final_with_bgm.mp4`.
@@ -417,6 +598,11 @@ Before finishing, check:
 - Mixing many unrelated text sizes, weights, colors, and label styles in one scene.
 - Making the video look like a classroom slide instead of a mobile-first short.
 - Rendering formulas with `Text("QK^T")` instead of `MathTex`.
+- Silently falling back from `MathTex` to `Text` after LaTeX fails.
+- Mixing Chinese and formulas in one object, which can trigger glyph or LaTeX failures.
+- Turning a 3b1b-style mechanism into a static PPT flowchart.
+- Generating only `voiceover.txt` and never producing or attaching `voiceover.wav`.
+- Claiming a final video is voiced without checking the final audio track.
 - Assuming Manim will generate narration from the spoken script automatically.
 - Showing too many arrows, labels, colors, or equations at once.
 - Ending without a conclusion or interaction hook.
