@@ -1,0 +1,15 @@
+{
+  "video_path": "episodes\\SEFN_004\\renders\\preview_no_bgm.mp4",
+  "bgm_path": "episodes\\SEFN_004\\audio\\bgm.wav",
+  "voiceover_path": null,
+  "source_audio": "video_audio",
+  "output_path": "episodes\\SEFN_004\\renders\\final_with_bgm.mp4",
+  "mixed_audio_path": "episodes\\SEFN_004\\audio\\mixed_audio.wav",
+  "video_duration": 24.267,
+  "bgm_duration": 110.094,
+  "output_duration": 24.267,
+  "mixed_audio_duration": 24.267,
+  "bgm_volume": 0.12,
+  "voiceover_volume": 1.0,
+  "has_audio": true
+}

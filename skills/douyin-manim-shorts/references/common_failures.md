@@ -82,3 +82,21 @@ Rules learned:
 - Use Remotion for global 9:16 layout, titles, subtitles, code cards, CTA, BGM, transitions, and final export.
 - New deep learning plug-in module shorts should default to Hybrid Manim + Remotion mode.
 - Keep old pure-Manim episodes as case studies; do not force them into a new structure unless the user asks for a remake.
+
+## SEFN_004 First Preview Pacing And Component Crowding
+
+Symptoms:
+
+- The first spoken sentence was accurate but soft: it did not immediately state a sharp module-specific pain point.
+- The video stretched to about 36 seconds because the script had too many spoken lines for a Douyin preview.
+- Several mechanism frames kept too many boxes visible at once, making the plug-in components feel like they were competing with the title, formula, and subtitle zones.
+- Contact-sheet thumbnails showed labels and arrows close enough that the whole screen felt busy even when full-resolution text was readable.
+
+Rules learned:
+
+- The first sentence must be a content-specific retention hook, not a neutral setup.
+- For first preview videos, target 20-24 seconds unless the user explicitly asks for a slower explanation.
+- Cut narration before stretching animation waits. A short video should not become long just because TTS is slow.
+- Use progressive replacement: show `spatial branch`, compress it to `S`, then show `x1/x2` and the gate. Do not show all SEFN internals as one graph.
+- Avoid placing long formulas on the same frame as the full mechanism graph. Either show the formula alone or use a short formula chip.
+- Add overlap checks as visual judgment, not just code warnings: if the contact sheet looks crowded, the frame is crowded.

@@ -1,16 +1,36 @@
 # Plug-in Module Video Structure
 
-Use this fixed structure for 20-30 second deep learning plug-in module shorts. The default production target is 21-26 seconds: fast enough for Douyin, long enough for one real mechanism animation.
+Use this fixed structure for 18-26 second deep learning plug-in module shorts. The default production target is 21-24 seconds: fast enough for Douyin, long enough for one real mechanism animation.
+
+## First-Sentence Hook Rule
+
+Highest priority: the first spoken sentence must be a content-specific retention hook tied to the current module's actual pain point, mechanism, or payoff.
+
+Allowed first sentences:
+
+- "Mamba 看得远，但会丢局部。"
+- "小目标丢了，不一定是主干太弱。"
+- "卷积看局部，SEFN 负责补空间感。"
+- "这个模块，只改三行就能接进 FPN。"
+
+Forbidden first sentences:
+
+- Generic greetings, background, or paper setup, such as "今天介绍一个模块".
+- Module-name-only openings, such as "这是 SEFN".
+- Abstract method phrasing, such as "本文提出一种新方法".
+- Any first sentence that could be reused for another module without changing meaning.
+
+The first frame must visually match the first sentence: show the named pain point or payoff before showing a dense module diagram.
 
 ## Standard 5-Beat Structure
 
 | Time | Beat | Goal |
 |---|---|---|
-| 0-3s | Pain-point hook | Make the viewer feel the module is useful. |
-| 3-7s | Problem visualization | Show what goes wrong in tensors, features, domains, masks, or branches. |
-| 7-15s | Core mechanism animation | Use Manim formulas, flow, curves, spectra, heatmaps, gates, residuals, or fusion. |
-| 15-21s | Code insertion | Show the exact 3-5 line minimum usage and highlight the inserted line. |
-| 21-26s | Resource-pack CTA | Promise the prepared PDF notes, PyTorch code, architecture figure, or demo package. |
+| 0-2.5s | Content-specific hook | Show one pain point or payoff that belongs to this exact module. |
+| 2.5-6s | Problem visualization | Show what goes wrong in tensors, features, domains, masks, or branches. |
+| 6-14s | Core mechanism animation | Use Manim formulas, flow, curves, spectra, heatmaps, gates, residuals, or fusion. |
+| 14-19s | Code insertion | Show the exact 3-5 line minimum usage and highlight the inserted line. |
+| 19-24s | Resource-pack CTA | Promise the prepared PDF notes, PyTorch code, architecture figure, or demo package. |
 
 Use the older six-scene structure below when a separate plug-position beat is needed. Otherwise, merge plug position into the mechanism or code beat.
 
@@ -70,6 +90,9 @@ Use the older six-scene structure below when a separate plug-position beat is ne
 - One video should teach one module and one adoption reason.
 - Never turn the video into a full paper report. The default story is: pain point -> mechanism -> code -> resource pack.
 - Use short voiceover lines. Avoid "本文提出" and "实验表明" unless the user specifically asks for academic reporting.
+- Prefer 10-14 spoken lines total for a 20-24 second episode.
+- If TTS exceeds 28 seconds, cut text before slowing the edit. Do not stretch the whole video to fit a verbose script.
+- Aim for one new visual state every 1.0-1.8 seconds in the first 8 seconds.
 
 ## Plug-in Module Voiceover Pattern
 

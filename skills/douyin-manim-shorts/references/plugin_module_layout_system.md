@@ -50,6 +50,32 @@ Every Manim scene must follow this order:
 
 Principle: clarity first, motion second. First layout, then animation. First QA, then final.
 
+## Anti-Overlap Composition Budget
+
+Highest priority for pure-Manim vertical shorts: one screen may not show every module component at once. Treat each frame like a mobile poster with one main idea.
+
+Hard limits:
+
+- At most 5 named foreground components per beat, excluding background and subtitles.
+- At most 4 arrows per beat.
+- At most 2 horizontal lanes per beat.
+- At most 1 formula per beat.
+- Minimum visible gap between two label boxes: `0.18` Manim units.
+- Minimum visible gap between arrow strokes and label text: `0.12` Manim units.
+- If a module has more than 5 components, split it into sequential reveals or replace earlier components with the next stage.
+- Do not keep faded old components under the current mechanism unless they are intentionally part of the comparison; remove them instead.
+- Contact-sheet thumbnails must still read as uncluttered. If a thumbnail looks like components are touching, the frame is too dense.
+
+Required staging pattern for complex plug-in modules:
+
+1. Show input and pain point.
+2. Replace with branch A only.
+3. Replace or compress branch A into a small token.
+4. Show branch B only.
+5. Show the fusion/gate/output only.
+
+Do not render the full architecture as one static block graph unless the architecture has fewer than 5 visible boxes.
+
 ## 9:16 Canvas Zones
 
 Default module-video canvas:

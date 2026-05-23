@@ -36,3 +36,9 @@ __pycache__/
 
 # OS files
 .DS_Store
+
+# Local secrets
+.env
+.env.*
+set_dashscope_env.cmd
+local_env.ps1

@@ -1,0 +1,27 @@
+{
+  "text_path": "episodes\\SEFN_004\\voiceover.txt",
+  "out_path": "episodes\\SEFN_004\\audio\\voiceover.wav",
+  "model": "cosyvoice-v3-flash",
+  "voice": "longxiaochun_v3",
+  "speed": 1.3,
+  "format": "wav",
+  "sample_rate_requested": 24000,
+  "method": "HttpSpeechSynthesizer",
+  "elapsed_seconds": 9.961,
+  "file_size_bytes": 1153714,
+  "audio": {
+    "codec": "pcm_s16le",
+    "sample_rate": 24000,
+    "channels": 1,
+    "duration": 24.034083
+  },
+  "dashscope_response": {
+    "status_code": null,
+    "code": null,
+    "message": null,
+    "request_id": null,
+    "output": null,
+    "audio_url": "<audio_url omitted>",
+    "audio_id": "audio_acf477f5-f587-91a9-a9d2-a5b0cc6c4a8c"
+  }
+}
